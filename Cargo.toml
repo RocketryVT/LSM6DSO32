@@ -1,21 +1,23 @@
 [package]
 authors = ["Gregory Wainer"]
 categories = ["embedded", "hardware-support", "no-std"]
-description = "Driver for ST lsm6dso32 sensor"
-documentation = "https://docs.rs/lsm6dso32-rs"
+description = "Driver for ST LSM6DSO32 IMU"
+documentation = "https://docs.rs/LSM6DSO32"
 edition = "2021"
 include = ["src/", "LICENSE-*", "README.md", "CHANGELOG.md", "COPYRIGHT"]
 keywords = [
     "i2c",
     "embedded-hal-driver",
     "lsm6dso32",
+    "imu",
+    "LSM6DSO32",
     "gyroscope",
     "accelerometer",
 ]
 license = "MIT"
-name = "lsm6dso32-rs"
+name = "LSM6DSO32"
 readme = "README.md"
-repository = "https://github.com/RocketryVT/lsm6dso32-rs"
+repository = "https://github.com/RocketryVT/LSM6DSO32"
 version = "0.0.1"
 
 [dependencies]
