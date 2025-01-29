@@ -67,7 +67,7 @@ pub enum Fs {
 
 impl Fs {
     /// Sensitivity mdps / LSB: G_So in Table 2.
-    pub fn sensitivity(&self) -> f32 {
+    pub async fn sensitivity(&self) -> f32 {
         match self {
             Fs::Dps125 => 4.375,
             Fs::Dps250 => 8.750,
@@ -77,7 +77,7 @@ impl Fs {
         }
     }
 
-    pub fn dps(&self) -> f32 {
+    pub async fn dps(&self) -> f32 {
         match self {
             Fs::Dps125 => 125.,
             Fs::Dps250 => 250.,
@@ -112,11 +112,11 @@ pub enum Odr {
 impl Register for Ctrl2G {}
 
 impl Ctrl2G {
-    pub fn new(value: u8, address: u8) -> Self {
+    pub async fn new(value: u8, address: u8) -> Self {
         Ctrl2G { address, value }
     }
 
-    pub fn gyroscope_data_rate(&self) -> f32 {
+    pub async fn gyroscope_data_rate(&self) -> f32 {
         match (self.value >> ODR_OFFSET) & ODR_MASK {
             0 => 0.0,
             1 => 12.5,
@@ -133,20 +133,20 @@ impl Ctrl2G {
         }
     }
 
-    pub fn set_gyroscope_data_rate<I2C>(
+    pub async fn set_gyroscope_data_rate<I2C>(
         &mut self,
         i2c: &mut I2C,
         value: Odr,
     ) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(ODR_MASK << ODR_OFFSET);
         self.value |= (value as u8) << ODR_OFFSET;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn chain_full_scale(&self) -> Fs {
+    pub async fn chain_full_scale(&self) -> Fs {
         if (self.value & 1 << FS4000) > 0 {
             return Fs::Dps2000;
         }
@@ -164,9 +164,9 @@ impl Ctrl2G {
         }
     }
 
-    pub fn set_chain_full_scale<I2C>(&mut self, i2c: &mut I2C, value: Fs) -> Result<(), I2C::Error>
+    pub async fn set_chain_full_scale<I2C>(&mut self, i2c: &mut I2C, value: Fs) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= 0b1111_0000;
 
@@ -178,6 +178,6 @@ impl Ctrl2G {
             self.value |= (value as u8) << FS_OFFSET;
         }
 
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 }

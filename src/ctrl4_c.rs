@@ -60,24 +60,24 @@ pub const LPF1_SEL_G: u8 = 1;
 impl Register for Ctrl4C {}
 
 impl Ctrl4C {
-    pub fn new(value: u8, address: u8) -> Self {
+    pub async fn new(value: u8, address: u8) -> Self {
         Ctrl4C { address, value }
     }
 
     /// Reads the raw register value.
-    pub fn bits(&self) -> u8 {
+    pub async fn bits(&self) -> u8 {
         self.value
     }
 
     /// Checks if gyroscope Sleep mode is enabled.
-    pub fn sleep_g(&self) -> bool {
+    pub async fn sleep_g(&self) -> bool {
         (self.value & (1 << SLEEP_G)) != 0
     }
 
     /// Enables or disables gyroscope Sleep mode.
-    pub fn set_sleep_g<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
+    pub async fn set_sleep_g<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         if enable {
             self.value |= 1 << SLEEP_G;
@@ -88,14 +88,14 @@ impl Ctrl4C {
     }
 
     /// Checks if all interrupt signals are routed to INT1 pin.
-    pub fn int2_on_int1(&self) -> bool {
+    pub async fn int2_on_int1(&self) -> bool {
         (self.value & (1 << INT2_ON_INT1)) != 0
     }
 
     /// Enables or disables routing all interrupts to INT1 pin.
-    pub fn set_int2_on_int1<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
+    pub async fn set_int2_on_int1<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         if enable {
             self.value |= 1 << INT2_ON_INT1;
@@ -106,14 +106,14 @@ impl Ctrl4C {
     }
 
     /// Checks if DRDY masking is enabled.
-    pub fn drdy_mask(&self) -> bool {
+    pub async fn drdy_mask(&self) -> bool {
         (self.value & (1 << DRDY_MASK)) != 0
     }
 
     /// Enables or disables data-ready masking (DRDY_MASK).
-    pub fn set_drdy_mask<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
+    pub async fn set_drdy_mask<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         if enable {
             self.value |= 1 << DRDY_MASK;
@@ -124,14 +124,14 @@ impl Ctrl4C {
     }
 
     /// Checks if I²C interface is disabled.
-    pub fn i2c_disabled(&self) -> bool {
+    pub async fn i2c_disabled(&self) -> bool {
         (self.value & (1 << I2C_DISABLE)) != 0
     }
 
     /// Enables or disables I²C interface.
-    pub fn set_i2c_disable<I2C>(&mut self, i2c: &mut I2C, disable: bool) -> Result<(), I2C::Error>
+    pub async fn set_i2c_disable<I2C>(&mut self, i2c: &mut I2C, disable: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         if disable {
             self.value |= 1 << I2C_DISABLE;
@@ -142,14 +142,14 @@ impl Ctrl4C {
     }
 
     /// Checks if gyroscope LPF1 is enabled.
-    pub fn lpf1_sel_g(&self) -> bool {
+    pub async fn lpf1_sel_g(&self) -> bool {
         (self.value & (1 << LPF1_SEL_G)) != 0
     }
 
     /// Enables or disables gyroscope LPF1.
-    pub fn set_lpf1_sel_g<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
+    pub async fn set_lpf1_sel_g<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         if enable {
             self.value |= 1 << LPF1_SEL_G;

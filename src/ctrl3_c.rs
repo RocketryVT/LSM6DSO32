@@ -102,60 +102,60 @@ pub const SW_RESET: u8 = 0;
 impl Register for Ctrl3C {}
 
 impl Ctrl3C {
-    pub fn new(value: u8, address: u8) -> Self {
+    pub async fn new(value: u8, address: u8) -> Self {
         Ctrl3C { address, value }
     }
 
-    pub fn boot(&mut self) -> bool {
+    pub async fn boot(&mut self) -> bool {
         self.value & (1 << BOOT) != 0
     }
 
     /// Reboots memory content.
     /// True: reboot memory content
-    pub fn set_boot<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_boot<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << BOOT);
         self.value |= u8::from(value) << BOOT;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn bdu(&mut self) -> bool {
+    pub async fn bdu(&mut self) -> bool {
         self.value & (1 << BDU) != 0
     }
 
     /// Block Data Update.
     /// True: output registers are not updated until MSB and LSB have been read.
-    pub fn set_bdu<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_bdu<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << BDU);
         self.value |= (value as u8) << BDU;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn if_inc(&mut self) -> bool {
+    pub async fn if_inc(&mut self) -> bool {
         self.value & (1 << IF_INC) != 0
     }
 
     /// True: Register address automatically incremented during a multiple byte access with a serial interface (I²C or SPI).
-    pub fn set_if_inc<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_if_inc<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << IF_INC);
         self.value |= (value as u8) << IF_INC;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
     /// Software reset.
-    pub fn sw_reset<I2C>(&mut self, i2c: &mut I2C) -> Result<(), I2C::Error>
+    pub async fn sw_reset<I2C>(&mut self, i2c: &mut I2C) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value |= 1 << SW_RESET;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 }

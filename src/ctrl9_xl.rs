@@ -94,105 +94,105 @@ pub const I3C_DISABLE: u8 = 1;
 impl Register for Ctrl9Xl {}
 
 impl Ctrl9Xl {
-    pub fn new(value: u8, address: u8) -> Self {
+    pub async fn new(value: u8, address: u8) -> Self {
         Ctrl9Xl { address, value }
     }
 
-    pub fn den_x(&mut self) -> bool {
+    pub async fn den_x(&mut self) -> bool {
         self.value & (1 << DEN_X) != 0
     }
 
     /// DEN value stored in LSB of X-axis.
-    pub fn set_den_x<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_den_x<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << DEN_X);
         self.value |= (value as u8) << DEN_X;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn den_y(&mut self) -> bool {
+    pub async fn den_y(&mut self) -> bool {
         self.value & (1 << DEN_Y) != 0
     }
 
     /// DEN value stored in LSB of Y-axis.
-    pub fn set_den_y<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_den_y<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << DEN_Y);
         self.value |= (value as u8) << DEN_Y;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn den_z(&mut self) -> bool {
+    pub async fn den_z(&mut self) -> bool {
         self.value & (1 << DEN_Z) != 0
     }
 
     /// DEN value stored in LSB of Z-axis.
-    pub fn set_den_z<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_den_z<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << DEN_Z);
         self.value |= (value as u8) << DEN_Z;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn den_xl_g(&mut self) -> bool {
+    pub async fn den_xl_g(&mut self) -> bool {
         self.value & (1 << DEN_XL_G) != 0
     }
 
     /// DEN stamping sensor selection.
-    pub fn set_den_xl_g<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_den_xl_g<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << DEN_XL_G);
         self.value |= (value as u8) << DEN_XL_G;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn den_xl_en(&mut self) -> bool {
+    pub async fn den_xl_en(&mut self) -> bool {
         self.value & (1 << DEN_XL_EN) != 0
     }
 
     /// Extends DEN functionality to accelerometer sensor.
-    pub fn set_den_xl_en<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_den_xl_en<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << DEN_XL_EN);
         self.value |= (value as u8) << DEN_XL_EN;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn den_lh(&mut self) -> bool {
+    pub async fn den_lh(&mut self) -> bool {
         self.value & (1 << DEN_LH) != 0
     }
 
     /// DEN active level configuration.
-    pub fn set_den_lh<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_den_lh<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << DEN_LH);
         self.value |= (value as u8) << DEN_LH;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn i3c_disable(&mut self) -> bool {
+    pub async fn i3c_disable(&mut self) -> bool {
         self.value & (1 << I3C_DISABLE) != 0
     }
 
     /// It is recommended to disable the I3C interface when the I3C interface is not used.
-    pub fn set_i3c_disable<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_i3c_disable<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << I3C_DISABLE);
         self.value |= (value as u8) << I3C_DISABLE;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 }

@@ -64,7 +64,7 @@ pub enum Fs_Xl {
 
 impl Fs_Xl {
     /// Sensitivity milli-g / LSB: LA_So in Table 2.
-    pub fn sensitivity(&self) -> f32 {
+    pub async fn sensitivity(&self) -> f32 {
         match self {
             Fs_Xl::G4 => 0.122,
             Fs_Xl::G8 => 0.244,
@@ -73,7 +73,7 @@ impl Fs_Xl {
         }
     }
 
-    pub fn g(&self) -> f32 {
+    pub async fn g(&self) -> f32 {
         match self {
             Fs_Xl::G4 => 4.,
             Fs_Xl::G8 => 8.,
@@ -108,11 +108,11 @@ pub enum Odr_Xl {
 impl Register for Ctrl1Xl {}
 
 impl Ctrl1Xl {
-    pub fn new(value: u8, address: u8) -> Self {
+    pub async fn new(value: u8, address: u8) -> Self {
         Ctrl1Xl { value, address }
     }
 
-    pub fn accelerometer_data_rate(&self) -> f32 {
+    pub async fn accelerometer_data_rate(&self) -> f32 {
         match (self.value >> ODR_XL_OFFSET) & ODR_XL_MASK {
             0 => 0.0,
             1 => 1.6,
@@ -130,20 +130,20 @@ impl Ctrl1Xl {
         }
     }
 
-    pub fn set_accelerometer_data_rate<I2C>(
+    pub async fn set_accelerometer_data_rate<I2C>(
         &mut self,
         i2c: &mut I2C,
         value: Odr_Xl,
     ) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(ODR_XL_MASK << ODR_XL_OFFSET);
         self.value |= (value as u8) << ODR_XL_OFFSET;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn chain_full_scale(&self) -> Fs_Xl {
+    pub async fn chain_full_scale(&self) -> Fs_Xl {
         match (self.value >> FS_OFFSET) & FS_MASK {
             0 => Fs_Xl::G4,
             1 => Fs_Xl::G32,
@@ -153,29 +153,29 @@ impl Ctrl1Xl {
         }
     }
 
-    pub fn set_chain_full_scale<I2C>(
+    pub async fn set_chain_full_scale<I2C>(
         &mut self,
         i2c: &mut I2C,
         value: Fs_Xl,
     ) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(FS_MASK << FS_OFFSET);
         self.value |= (value as u8) << FS_OFFSET;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
-    pub fn lpf2_xl_en(&mut self) -> bool {
+    pub async fn lpf2_xl_en(&mut self) -> bool {
         self.value & (1 << LPF2_XL_EN) != 0
     }
 
-    pub fn set_lpf2_xl_en<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
+    pub async fn set_lpf2_xl_en<I2C>(&mut self, i2c: &mut I2C, value: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value &= !(1 << LPF2_XL_EN);
         self.value |= (value as u8) << LPF2_XL_EN;
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 }

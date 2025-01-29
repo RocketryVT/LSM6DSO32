@@ -88,16 +88,16 @@ impl Ctrl7G {
     /// True: disabled
     /// 
     /// False: enabled
-    pub fn set_g_hm_mode<I2C>(&mut self, i2c: &mut I2C, disable: bool) -> Result<(), I2C::Error>
+    pub async fn set_g_hm_mode<I2C>(&mut self, i2c: &mut I2C, disable: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         if disable {
             self.value |= 1 << G_HM_MODE;
         } else {
             self.value &= !(1 << G_HM_MODE);
         }
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
     /// Checks if gyroscope HP filter is enabled (bit 6).
@@ -106,16 +106,16 @@ impl Ctrl7G {
     }
 
     /// Enables or disables gyroscope HP filter.
-    pub fn set_hp_en_g<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
+    pub async fn set_hp_en_g<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         if enable {
             self.value |= 1 << HP_EN_G;
         } else {
             self.value &= !(1 << HP_EN_G);
         }
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
     /// Reads the current HPM_G selection (bits [5:4]).
@@ -130,12 +130,12 @@ impl Ctrl7G {
     }
 
     /// Sets HPM_G bits [5:4].
-    pub fn set_hpm_g<I2C>(&mut self, i2c: &mut I2C, value: HpmG) -> Result<(), I2C::Error>
+    pub async fn set_hpm_g<I2C>(&mut self, i2c: &mut I2C, value: HpmG) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         self.value = (self.value & !HPM_G_MASK) | ((value as u8) << HPM_G_OFFSET);
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 
     /// Checks if accelerometer user offset correction block is enabled (bit 1).
@@ -144,15 +144,15 @@ impl Ctrl7G {
     }
 
     /// Enables or disables accelerometer user offset correction block.
-    pub fn set_usr_off_on_out<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
+    pub async fn set_usr_off_on_out<I2C>(&mut self, i2c: &mut I2C, enable: bool) -> Result<(), I2C::Error>
     where
-        I2C: embedded_hal::i2c::I2c,
+        I2C: embedded_hal_async::i2c::I2c,
     {
         if enable {
             self.value |= 1 << USR_OFF_ON_OUT;
         } else {
             self.value &= !(1 << USR_OFF_ON_OUT);
         }
-        self.write(i2c, self.address, ADDR, self.value)
+        self.write(i2c, self.address, ADDR, self.value).await
     }
 }
