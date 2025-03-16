@@ -28,8 +28,8 @@ use ctrl9_xl::Ctrl9Xl;
 pub const DEFAULT_I2C_ADDRESS: u8 = 0x6Bu8;
 pub const ALT_I2C_ADDRESS: u8 = 0x6Au8;
 
-const SENSORS_DPS_TO_RADS: f32 = 0.017453292;
-const SENSORS_GRAVITY_STANDARD: f32 = 9.80665;
+const SENSORS_DPS_TO_RADS: f64 = 0.017453292;
+const SENSORS_GRAVITY_STANDARD: f64 = 9.80665;
 
 #[derive(Copy, Clone, Debug, defmt::Format)]
 pub struct GyroValue {
@@ -57,18 +57,18 @@ impl GyroValue {
     }
 
     /// As radians [rad]
-    pub async fn as_rad(&self) -> [f32; 3] {
+    pub async fn as_rad(&self) -> [f64; 3] {
         self.as_mdps().await.map(|v| v * SENSORS_DPS_TO_RADS / 1000.)
     }
 
     /// As milli degrees per second [mdps]
-    pub async fn as_mdps(&self) -> [f32; 3] {
-        let sensitivity = self.range.sensitivity().await as f32;
-        self.count.map(|r| r as f32 * sensitivity)
+    pub async fn as_mdps(&self) -> [f64; 3] {
+        let sensitivity = self.range.sensitivity().await as f64;
+        self.count.map(|r| r as f64 * sensitivity)
     }
 
     /// As degrees per second [dps]
-    pub async fn as_dps(&self) -> [f32; 3] {
+    pub async fn as_dps(&self) -> [f64; 3] {
         self.as_mdps().await.map(|v| v / 1000.)
     }
 }
@@ -99,22 +99,28 @@ impl AccelValue {
     }
 
     /// As [m/s^2]
-    pub async fn as_m_ss(&self) -> [f32; 3] {
+    pub async fn as_m_ss(&self) -> [f64; 3] {
         self.as_mg().await.map(|v| v * SENSORS_GRAVITY_STANDARD / 1000.)
     }
 
     /// As [milli-g]
-    pub async fn as_mg(&self) -> [f32; 3] {
-        let sensitivity = self.range.sensitivity().await as f32;
-        self.count.map(|r| r as f32 * sensitivity)
+    pub async fn as_mg(&self) -> [f64; 3] {
+        let sensitivity = self.range.sensitivity().await as f64;
+        self.count.map(|r| r as f64 * sensitivity)
     }
 
     /// As [g]
-    pub async fn as_g(&self) -> [f32; 3] {
+    pub async fn as_g(&self) -> [f64; 3] {
         self.as_mg().await.map(|v| v / 1000.)
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct Measurement {
+    pub gyro: GyroValue,
+    pub accel: AccelValue,
+    pub temp: f32,
+}
 
 trait Register {
     #[allow(dead_code)]
@@ -227,6 +233,26 @@ impl Lsm6dso32 {
         i2c.write_read(self.address, &[0x28], &mut measurements).await?;
 
         Ok(AccelValue::from_msr(scale.await, &measurements).await)
+    }
+
+    pub async fn get_measurement<I2C>(&mut self, i2c: &mut I2C) -> Result<Measurement, I2C::Error>
+    where
+        I2C: embedded_hal_async::i2c::I2c,
+    {
+        let mut measurements = [0u8; 14];
+        i2c.write_read(self.address, &[0x20], &mut measurements).await?;
+
+        let raw_temp = (measurements[1] as i16) << 8 | measurements[0] as i16;
+        let temp = (raw_temp as f32 / 256.0) + 25.0;
+
+        let gyro = GyroValue::from_msr(self.ctrl2g.chain_full_scale().await, &measurements[2..8].try_into().unwrap()).await;
+        let accel = AccelValue::from_msr(self.ctrl1xl.chain_full_scale().await, &measurements[8..14].try_into().unwrap()).await;
+
+        Ok(Measurement {
+            gyro,
+            accel,
+            temp,
+        })
     }
 
     // pub async fn fifo_pop<I2C>(&mut self, i2c: &mut I2C) -> Result<fifo::Value, I2C::Error>
